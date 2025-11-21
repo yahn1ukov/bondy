@@ -1,0 +1,78 @@
+name:
+
+services:
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - bondy-network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bondy-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9090"
+    environment:
+      MINIO_ROOT_USER:
+      MINIO_ROOT_PASSWORD:
+      MINIO_BROWSER:
+      MINIO_REGION:
+    ports:
+      - 9000:9000
+      - 9090:9090
+    volumes:
+      - minio_data:/data
+    networks:
+      - bondy-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+    command: >
+      redis-server 
+      --requirepass 
+      --appendonly
+    volumes:
+      - redis_data:/data
+    networks:
+      - bondy-network
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight
+    ports:
+      - 5540:5540
+    volumes:
+      - redis_insight_data:/data
+    depends_on:
+      - redis
+    networks:
+      - bondy-network
+
+volumes:
+  postgres_data:
+  minio_data:
+  redis_data:
+  redis_insight_data:
+
+networks:
+  bondy-network:
+    driver: bridge
