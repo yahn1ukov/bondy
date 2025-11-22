@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import type { CookieOptions, Response } from 'express';
+import type { Response } from 'express';
 
 import { ConfigService } from '@/config/config.service';
 
@@ -12,7 +12,7 @@ export class CookieHelper {
     res.cookie(this.configService.cookieName, refreshToken, {
       httpOnly: this.configService.cookieHttpOnly,
       secure: this.configService.cookieSecure,
-      sameSite: this.configService.cookieSameSite as CookieOptions['sameSite'],
+      sameSite: this.configService.cookieSameSite,
       maxAge: this.configService.cookieMaxAge,
     });
   }
@@ -21,7 +21,7 @@ export class CookieHelper {
     res.clearCookie(this.configService.cookieName, {
       httpOnly: this.configService.cookieHttpOnly,
       secure: this.configService.cookieSecure,
-      sameSite: this.configService.cookieSameSite as CookieOptions['sameSite'],
+      sameSite: this.configService.cookieSameSite,
     });
   }
 }

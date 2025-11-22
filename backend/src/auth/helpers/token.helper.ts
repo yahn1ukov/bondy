@@ -7,10 +7,10 @@ import Redis from 'ioredis';
 import { ConfigService } from '@/config/config.service';
 import { REDIS_CLIENT } from '@/redis/redis.module';
 
-import { ActiveUserData } from '../interfaces/active-user-data.interface';
-import { DecodedToken } from '../interfaces/decoded-token.interface';
-import { JwtPayload } from '../interfaces/jwt-payload.interface';
-import { Tokens } from '../interfaces/tokens.interface';
+import type { ActiveUserData } from '../interfaces/active-user-data.interface';
+import type { DecodedToken } from '../interfaces/decoded-token.interface';
+import type { JwtPayload } from '../interfaces/jwt-payload.interface';
+import type { Tokens } from '../interfaces/tokens.interface';
 
 @Injectable()
 export class TokenHelper {

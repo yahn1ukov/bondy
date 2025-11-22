@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ConfigService } from '@/config/config.service';
@@ -22,14 +21,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: configService.jwtAccessSecretKey,
-      passReqToCallback: true,
     });
   }
 
-  async validate(req: Request, payload: JwtPayload): Promise<ActiveUserData> {
+  async validate(payload: JwtPayload): Promise<ActiveUserData> {
     const isBlacklisted = await this.tokenHelper.isBlacklisted(payload.jti);
     if (isBlacklisted) {
-      throw new UnauthorizedException('Token revoked.');
+      throw new UnauthorizedException('Token revoked');
     }
 
     const user = await this.usersService.findById(payload.id);

@@ -1,0 +1,33 @@
+export interface EnvironmentVariables {
+  NODE_ENV: string;
+  PORT: number;
+  APP_ENDPOINT_PREFIX: string;
+  APP_VERSION: string;
+  CORS_ORIGIN: string;
+  THROTTLER_TTL: number;
+  THROTTLER_LIMIT: number;
+  DATABASE_TYPE: string;
+  DATABASE_HOST: string;
+  DATABASE_PORT: number;
+  DATABASE_USER: string;
+  DATABASE_PASSWORD: string;
+  DATABASE_NAME: string;
+  S3_ENDPOINT: string;
+  S3_PORT: number;
+  S3_ACCESS_KEY: string;
+  S3_SECRET_KEY: string;
+  S3_BUCKET: string;
+  S3_REGION: string;
+  S3_USE_SSL: boolean;
+  REDIS_HOST: string;
+  REDIS_PORT: number;
+  REDIS_PASSWORD: string;
+  JWT_TOKEN_TYPE: string;
+  JWT_ACCESS_SECRET_KEY: string;
+  JWT_ACCESS_EXPIRES_IN: number;
+  JWT_REFRESH_SECRET_KEY: string;
+  JWT_REFRESH_EXPIRES_IN: number;
+  COOKIE_NAME: string;
+  COOKIE_HTTP_ONLY: boolean;
+  COOKIE_SAME_SITE: string;
+}

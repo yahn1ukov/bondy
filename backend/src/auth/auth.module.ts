@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { LocalAuthGuard } from './guards/local.guard';
 import { CookieHelper } from './helpers/cookie.helper';
 import { TokenHelper } from './helpers/token.helper';
+import { CookieInterceptor } from './interceptors/cookie.interceptor';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -37,6 +38,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     AuthService,
     TokenHelper,
     CookieHelper,
+    CookieInterceptor,
     LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,

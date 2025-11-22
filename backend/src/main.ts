@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
-import { TypeOrmExceptionFilter } from './common/typeorm-exception.filter';
+import { TypeOrmExceptionFilter } from './common/filters/typeorm-exception.filter';
 import { ConfigService } from './config/config.service';
 
 async function bootstrap(): Promise<void> {

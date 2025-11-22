@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { HashHelper } from './hash.helper';
+import { HashHelper } from './helpers/hash.helper';
 
 @Module({
   providers: [HashHelper],

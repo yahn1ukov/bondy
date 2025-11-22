@@ -3,7 +3,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/commo
 import type { Response } from 'express';
 import { QueryFailedError } from 'typeorm';
 
-import type { PostgresError } from './postgres-error.interface';
+import type { PostgresError } from '../interfaces/postgres-error.interface';
 
 @Catch(QueryFailedError)
 export class TypeOrmExceptionFilter implements ExceptionFilter {

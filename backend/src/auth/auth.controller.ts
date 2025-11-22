@@ -7,21 +7,20 @@ import {
   Post,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import type { Response } from 'express';
 
-import { ConfigService } from '@/config/config.service';
-
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { LocalAuthGuard } from './guards/local.guard';
 import { CookieHelper } from './helpers/cookie.helper';
+import { CookieInterceptor } from './interceptors/cookie.interceptor';
 import type { ActiveUserData } from './interfaces/active-user-data.interface';
 import type { Tokens } from './interfaces/tokens.interface';
 
@@ -30,42 +29,28 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly cookieHelper: CookieHelper,
-    private readonly configService: ConfigService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
+  @UseInterceptors(CookieInterceptor)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() _: LoginRequestDto,
-    @CurrentUser() user: ActiveUserData,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
-    const tokens = await this.authService.login(user);
-
-    return this.buildResponse(res, tokens);
+  async login(@Body() _: LoginRequestDto, @CurrentUser() user: ActiveUserData): Promise<Tokens> {
+    return this.authService.login(user);
   }
 
+  @UseInterceptors(CookieInterceptor)
   @Post('register')
-  async register(
-    @Body() dto: RegisterRequestDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
-    const tokens = await this.authService.register(dto);
-
-    return this.buildResponse(res, tokens);
+  async register(@Body() dto: RegisterRequestDto): Promise<Tokens> {
+    return this.authService.register(dto);
   }
 
   @UseGuards(JwtRefreshAuthGuard)
+  @UseInterceptors(CookieInterceptor)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(
-    @CurrentUser() user: ActiveUserData,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
-    const tokens = await this.authService.refresh(user);
-
-    return this.buildResponse(res, tokens);
+  async refresh(@CurrentUser() user: ActiveUserData): Promise<Tokens> {
+    return this.authService.refresh(user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -81,15 +66,5 @@ export class AuthController {
     await this.authService.logout(userId, accessToken);
 
     this.cookieHelper.clear(res);
-  }
-
-  private buildResponse(res: Response, tokens: Tokens): AuthResponseDto {
-    this.cookieHelper.set(res, tokens.refreshToken);
-
-    return {
-      tokenType: this.configService.jwtTokenType,
-      accessToken: tokens.accessToken,
-      expiresIn: this.configService.jwtAccessExpiresIn,
-    };
   }
 }

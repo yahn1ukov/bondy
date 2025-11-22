@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-import { IsNotMatch } from '@/common/is-not-match.decorator';
+import { IsNotMatch } from '@/common/decorators/is-not-match.decorator';
 
 export class UpdateUserPasswordDto {
   @IsString()

@@ -1,4 +1,4 @@
-import { JwtPayload } from './jwt-payload.interface';
+import type { JwtPayload } from './jwt-payload.interface';
 
 export interface DecodedToken extends JwtPayload {
   iat: number;

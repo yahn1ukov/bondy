@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { HashHelper } from '@/common/hash.helper';
+import { HashHelper } from '@/common/helpers/hash.helper';
 import { UsersService } from '@/users/users.service';
 
 import { RegisterRequestDto } from './dto/register-request.dto';
