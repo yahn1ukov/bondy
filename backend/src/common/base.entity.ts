@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class BaseEntity {
@@ -8,5 +9,6 @@ export abstract class BaseEntity {
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
+  @Exclude()
   updatedAt: Date;
 }

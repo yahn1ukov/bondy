@@ -23,7 +23,7 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { LocalAuthGuard } from './guards/local.guard';
 import { CookieHelper } from './helpers/cookie.helper';
 import type { ActiveUserData } from './interfaces/active-user-data.interface';
-import { Tokens } from './interfaces/tokens.interface';
+import type { Tokens } from './interfaces/tokens.interface';
 
 @Controller('auth')
 export class AuthController {

@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 
+import { randomUUID } from 'crypto';
 import Redis from 'ioredis';
 
 import { ConfigService } from '@/config/config.service';
 import { REDIS_CLIENT } from '@/redis/redis.module';
 
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
 import { DecodedToken } from '../interfaces/decoded-token.interface';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { Tokens } from '../interfaces/tokens.interface';
@@ -22,7 +24,9 @@ export class TokenHelper {
     return this.jwtService.decode(token);
   }
 
-  async generate(payload: JwtPayload): Promise<Tokens> {
+  async generate(user: ActiveUserData): Promise<Tokens> {
+    const payload: JwtPayload = { id: user.id, jti: randomUUID() };
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.jwtAccessSecretKey,
@@ -37,17 +41,17 @@ export class TokenHelper {
     return { accessToken, refreshToken };
   }
 
-  async blacklist(userId: string, accessToken: string, expiresIn: number): Promise<void> {
+  async blacklist(userId: string, jti: string, expiresIn: number): Promise<void> {
     const now = Math.floor(Date.now() / 1000);
     const ttl = expiresIn - now;
 
     if (ttl > 0) {
-      await this.redis.set(`blacklist:${accessToken}`, userId, 'EX', ttl);
+      await this.redis.set(`blacklist:${jti}`, userId, 'EX', ttl);
     }
   }
 
-  async isBlacklisted(accessToken: string): Promise<boolean> {
-    const exists = await this.redis.exists(`blacklist:${accessToken}`);
+  async isBlacklisted(jti: string): Promise<boolean> {
+    const exists = await this.redis.exists(`blacklist:${jti}`);
     return exists === 1;
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { CookieOptions, Response } from 'express';
+import type { CookieOptions, Response } from 'express';
 
 import { ConfigService } from '@/config/config.service';
 

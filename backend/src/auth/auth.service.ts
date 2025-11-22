@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+import { HashHelper } from '@/common/hash.helper';
 import { UsersService } from '@/users/users.service';
 
 import { RegisterRequestDto } from './dto/register-request.dto';
-import { HashHelper } from './helpers/hash.helper';
 import { TokenHelper } from './helpers/token.helper';
-import { ActiveUserData } from './interfaces/active-user-data.interface';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { Tokens } from './interfaces/tokens.interface';
+import type { ActiveUserData } from './interfaces/active-user-data.interface';
+import type { Tokens } from './interfaces/tokens.interface';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +17,7 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<ActiveUserData | null> {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email.toLowerCase());
     if (!user) {
       return null;
     }
@@ -53,7 +52,7 @@ export class AuthService {
   async register(dto: RegisterRequestDto): Promise<Tokens> {
     const passwordHash = await this.hashHelper.hash(dto.password);
 
-    const user = await this.usersService.create({ email: dto.email, passwordHash });
+    const user = await this.usersService.create({ email: dto.email.toLowerCase(), passwordHash });
 
     return this.issueTokens({ id: user.id, email: user.email });
   }
@@ -66,15 +65,13 @@ export class AuthService {
     await this.usersService.updateRefreshToken(userId, null);
 
     const payload = this.tokenHelper.decode(accessToken);
-    if (payload?.exp) {
-      await this.tokenHelper.blacklist(userId, accessToken, payload.exp);
+    if (payload?.jti && payload?.exp) {
+      await this.tokenHelper.blacklist(userId, payload.jti, payload.exp);
     }
   }
 
   async issueTokens(user: ActiveUserData): Promise<Tokens> {
-    const payload: JwtPayload = { id: user.id };
-
-    const tokens = await this.tokenHelper.generate(payload);
+    const tokens = await this.tokenHelper.generate(user);
 
     const refreshTokenHash = await this.hashHelper.hash(tokens.refreshToken);
     await this.usersService.updateRefreshToken(user.id, refreshTokenHash);

@@ -1,15 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { Request } from 'express';
+import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ConfigService } from '@/config/config.service';
 import { UsersService } from '@/users/users.service';
 
 import { TokenHelper } from '../helpers/token.helper';
-import { ActiveUserData } from '../interfaces/active-user-data.interface';
-import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import type { ActiveUserData } from '../interfaces/active-user-data.interface';
+import type { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -27,12 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, payload: JwtPayload): Promise<ActiveUserData> {
-    const accessToken = req.get('authorization')?.replace('Bearer', '').trim();
-    if (!accessToken) {
-      throw new UnauthorizedException();
-    }
-
-    const isBlacklisted = await this.tokenHelper.isBlacklisted(accessToken);
+    const isBlacklisted = await this.tokenHelper.isBlacklisted(payload.jti);
     if (isBlacklisted) {
       throw new UnauthorizedException('Token revoked.');
     }

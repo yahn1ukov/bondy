@@ -4,7 +4,12 @@ import { ConfigService as NestConfigService } from '@nestjs/config';
 interface EnvironmentVariables {
   NODE_ENV: string;
   PORT: number;
-  DATABASE_DRIVER: string;
+  APP_ENDPOINT_PREFIX: string;
+  APP_VERSION: string;
+  CORS_ORIGIN: string;
+  THROTTLER_TTL: number;
+  THROTTLER_LIMIT: number;
+  DATABASE_TYPE: string;
   DATABASE_HOST: string;
   DATABASE_PORT: number;
   DATABASE_USER: string;
@@ -42,8 +47,28 @@ export class ConfigService {
     return +this.configService.get('PORT', 3000);
   }
 
-  get dbDriver(): string {
-    return this.configService.get('DATABASE_DRIVER', '');
+  get appEndpointPrefix(): string {
+    return this.configService.get('APP_ENDPOINT_PREFIX', '');
+  }
+
+  get appVersion(): string {
+    return this.configService.get('APP_VERSION', '');
+  }
+
+  get corsOrigin(): string {
+    return this.configService.get('CORS_ORIGIN', '');
+  }
+
+  get throttlerTtl(): number {
+    return +this.configService.get('THROTTLER_TTL', 0);
+  }
+
+  get throttlerLimit(): number {
+    return +this.configService.get('THROTTLER_LIMIT', 0);
+  }
+
+  get dbType(): string {
+    return this.configService.get('DATABASE_TYPE', '');
   }
 
   get dbHost(): string {
