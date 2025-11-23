@@ -15,16 +15,18 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
       switch (driverError.code) {
         case '23505':
           res.status(HttpStatus.CONFLICT).json({
-            statusCode: HttpStatus.CONFLICT,
             message: 'This record already exists',
+            error: 'Conflict',
+            statusCode: HttpStatus.CONFLICT,
           });
           return;
       }
     }
 
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Internal server error',
+      error: 'Internal',
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
     });
   }
 

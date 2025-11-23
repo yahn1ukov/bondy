@@ -46,7 +46,7 @@ export class UsersService {
 
     const isMatch = await this.hashHelper.verify(user.passwordHash, dto.oldPassword);
     if (!isMatch) {
-      throw new BadRequestException('Invalid current password.');
+      throw new BadRequestException('Invalid current password');
     }
 
     const passwordHash = await this.hashHelper.hash(dto.newPassword);

@@ -27,7 +27,7 @@ import type { Tokens } from './interfaces/tokens.interface';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
+    private readonly service: AuthService,
     private readonly cookieHelper: CookieHelper,
   ) {}
 
@@ -36,21 +36,26 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() _: LoginRequestDto, @CurrentUser() user: ActiveUserData): Promise<Tokens> {
-    return this.authService.login(user);
+    return this.service.login(user);
   }
 
   @UseInterceptors(CookieInterceptor)
   @Post('register')
   async register(@Body() dto: RegisterRequestDto): Promise<Tokens> {
-    return this.authService.register(dto);
+    return this.service.register(dto);
   }
 
   @UseGuards(JwtRefreshAuthGuard)
   @UseInterceptors(CookieInterceptor)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@CurrentUser() user: ActiveUserData): Promise<Tokens> {
-    return this.authService.refresh(user);
+  async refresh(
+    @CurrentUser() user: ActiveUserData,
+    @Headers('authorization') authorizationHeader: string,
+  ): Promise<Tokens> {
+    const accessToken = authorizationHeader.split(' ')[1];
+
+    return this.service.refresh(user, accessToken);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -58,12 +63,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(
     @CurrentUser('id') userId: string,
-    @Headers('authorization') header: string,
+    @Headers('authorization') authorizationHeader: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const accessToken = header.split(' ')[1];
+    const accessToken = authorizationHeader.split(' ')[1];
 
-    await this.authService.logout(userId, accessToken);
+    await this.service.logout(userId, accessToken);
 
     this.cookieHelper.clear(res);
   }

@@ -57,25 +57,31 @@ export class AuthService {
     return this.issueTokens({ id: user.id, email: user.email });
   }
 
-  async refresh(user: ActiveUserData): Promise<Tokens> {
+  async refresh(user: ActiveUserData, accessToken: string): Promise<Tokens> {
+    await this.blacklistAccessToken(user.id, accessToken);
+
     return this.issueTokens(user);
   }
 
   async logout(userId: string, accessToken: string): Promise<void> {
-    await this.usersService.updateRefreshToken(userId, null);
+    await this.blacklistAccessToken(userId, accessToken);
 
-    const payload = this.tokenHelper.decode(accessToken);
-    if (payload?.jti && payload?.exp) {
-      await this.tokenHelper.blacklist(userId, payload.jti, payload.exp);
-    }
+    await this.usersService.updateRefreshToken(userId, null);
   }
 
-  async issueTokens(user: ActiveUserData): Promise<Tokens> {
+  private async issueTokens(user: ActiveUserData): Promise<Tokens> {
     const tokens = await this.tokenHelper.generate(user);
 
     const refreshTokenHash = await this.hashHelper.hash(tokens.refreshToken);
     await this.usersService.updateRefreshToken(user.id, refreshTokenHash);
 
     return tokens;
+  }
+
+  private async blacklistAccessToken(userId: string, accessToken: string): Promise<void> {
+    const payload = this.tokenHelper.decode(accessToken);
+    if (payload?.jti && payload?.exp) {
+      await this.tokenHelper.blacklist(userId, payload.jti, payload.exp);
+    }
   }
 }
