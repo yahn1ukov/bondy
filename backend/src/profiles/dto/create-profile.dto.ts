@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-import { Gender } from '@/common/enums/gender.enum';
+import { UserGender } from '@/common/enums/user-gender.enum';
 
 export class CreateProfileDto {
   @IsString()
@@ -16,9 +16,9 @@ export class CreateProfileDto {
   @IsOptional()
   bio?: string;
 
-  @IsEnum(Gender)
+  @IsEnum(UserGender)
   @IsNotEmpty()
-  gender: Gender;
+  gender: UserGender;
 
   @Type(() => Date)
   @IsDate()

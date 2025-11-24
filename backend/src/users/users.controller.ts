@@ -1,7 +1,10 @@
-import { Body, Controller, Delete, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Patch, Res, UseGuards } from '@nestjs/common';
+
+import type { Response } from 'express';
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
+import { CookieHelper } from '@/common/helpers/cookie.helper';
 
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,7 +13,10 @@ import { UsersService } from './users.service';
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly service: UsersService) {}
+  constructor(
+    private readonly service: UsersService,
+    private readonly cookieHelper: CookieHelper,
+  ) {}
 
   @Patch('password')
   async updatePassword(
@@ -26,7 +32,12 @@ export class UsersController {
   }
 
   @Delete()
-  async delete(@CurrentUser('id') id: string): Promise<void> {
+  async delete(
+    @CurrentUser('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    this.cookieHelper.clear(res);
+
     return this.service.delete(id);
   }
 }

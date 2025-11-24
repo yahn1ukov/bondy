@@ -12,6 +12,8 @@ import {
 
 import type { Response } from 'express';
 
+import { CookieHelper } from '@/common/helpers/cookie.helper';
+
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { LoginRequestDto } from './dto/login-request.dto';
@@ -19,7 +21,6 @@ import { RegisterRequestDto } from './dto/register-request.dto';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { LocalAuthGuard } from './guards/local.guard';
-import { CookieHelper } from './helpers/cookie.helper';
 import { CookieInterceptor } from './interceptors/cookie.interceptor';
 import type { ActiveUserData } from './interfaces/active-user-data.interface';
 import type { Tokens } from './interfaces/tokens.interface';
@@ -68,8 +69,8 @@ export class AuthController {
   ): Promise<void> {
     const accessToken = authorizationHeader.split(' ')[1];
 
-    await this.service.logout(userId, accessToken);
-
     this.cookieHelper.clear(res);
+
+    return this.service.logout(userId, accessToken);
   }
 }

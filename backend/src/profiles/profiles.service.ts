@@ -13,6 +13,10 @@ export class ProfilesService {
     @InjectRepository(ProfilesEntity) private readonly repository: Repository<ProfilesEntity>,
   ) {}
 
+  async findByUserId(userId: string): Promise<ProfilesEntity | null> {
+    return this.repository.findOneBy({ user: { id: userId } });
+  }
+
   async create(userId: string, dto: CreateProfileDto): Promise<void> {
     const isExists = await this.repository.existsBy({ user: { id: userId } });
     if (isExists) {

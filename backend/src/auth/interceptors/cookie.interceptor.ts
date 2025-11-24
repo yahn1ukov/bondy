@@ -4,10 +4,10 @@ import { Response } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { CookieHelper } from '@/common/helpers/cookie.helper';
 import { ConfigService } from '@/config/config.service';
 
 import { AuthResponseDto } from '../dto/auth-response.dto';
-import { CookieHelper } from '../helpers/cookie.helper';
 import type { Tokens } from '../interfaces/tokens.interface';
 
 @Injectable()

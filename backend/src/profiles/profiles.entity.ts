@@ -1,8 +1,9 @@
 import { Exclude, Expose } from 'class-transformer';
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
-import { Gender } from '@/common/enums/gender.enum';
+import { UserGender } from '@/common/enums/user-gender.enum';
+import { LinksEntity } from '@/links/links.entity';
 import { UsersEntity } from '@/users/users.entity';
 
 @Entity('profiles')
@@ -23,8 +24,8 @@ export class ProfilesEntity extends BaseEntity {
   @Column('text', { nullable: true })
   bio: string | null;
 
-  @Column('enum', { enum: Gender })
-  gender: Gender;
+  @Column('enum', { enum: UserGender })
+  gender: UserGender;
 
   @Column()
   birth: Date;
@@ -32,4 +33,7 @@ export class ProfilesEntity extends BaseEntity {
   @OneToOne(() => UsersEntity, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: UsersEntity;
+
+  @OneToMany(() => LinksEntity, (links) => links.profile)
+  links: LinksEntity[];
 }

@@ -11,7 +11,6 @@ import { AuthService } from './auth.service';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { LocalAuthGuard } from './guards/local.guard';
-import { CookieHelper } from './helpers/cookie.helper';
 import { TokenHelper } from './helpers/token.helper';
 import { CookieInterceptor } from './interceptors/cookie.interceptor';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
@@ -37,7 +36,6 @@ import { LocalStrategy } from './strategies/local.strategy';
   providers: [
     AuthService,
     TokenHelper,
-    CookieHelper,
     CookieInterceptor,
     LocalStrategy,
     JwtStrategy,
