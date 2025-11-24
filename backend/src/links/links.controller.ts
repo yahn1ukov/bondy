@@ -14,8 +14,8 @@ import { CurrentUser } from '@/auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
 import { CreateLinkDto } from './dto/create-link.dto';
-import { LinkDto } from './dto/link.dto';
 import { UpdateLinkDto } from './dto/update-link.dto';
+import { LinksEntity } from './links.entity';
 import { LinksService } from './links.service';
 
 @UseGuards(JwtAuthGuard)
@@ -29,7 +29,7 @@ export class LinksController {
   }
 
   @Get()
-  async getAll(@CurrentUser('id') userId: string): Promise<LinkDto[]> {
+  async getAll(@CurrentUser('id') userId: string): Promise<LinksEntity[]> {
     return this.service.getAll(userId);
   }
 

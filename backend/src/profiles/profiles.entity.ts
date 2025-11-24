@@ -32,6 +32,7 @@ export class ProfilesEntity extends BaseEntity {
 
   @OneToOne(() => UsersEntity, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
+  @Exclude()
   user: UsersEntity;
 
   @OneToMany(() => LinksEntity, (links) => links.profile)
