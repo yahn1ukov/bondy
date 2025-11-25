@@ -27,7 +27,7 @@ export class AuthService {
       return null;
     }
 
-    return { id: user.id, email: user.email };
+    return { id: user.id };
   }
 
   async validateRefreshToken(userId: string, refreshToken: string): Promise<ActiveUserData | null> {
@@ -42,7 +42,7 @@ export class AuthService {
       return null;
     }
 
-    return { id: user.id, email: user.email };
+    return { id: user.id };
   }
 
   async login(user: ActiveUserData): Promise<Tokens> {
@@ -54,7 +54,7 @@ export class AuthService {
 
     const user = await this.usersService.create({ email: dto.email.toLowerCase(), passwordHash });
 
-    return this.issueTokens({ id: user.id, email: user.email });
+    return this.issueTokens({ id: user.id });
   }
 
   async refresh(user: ActiveUserData, accessToken: string): Promise<Tokens> {

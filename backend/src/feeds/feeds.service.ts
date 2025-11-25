@@ -31,31 +31,44 @@ export class FeedsService {
 
     const query = this.profilesRepository
       .createQueryBuilder('profile')
-      .leftJoinAndSelect('profile.user', 'user')
-      .leftJoinAndSelect('profile.links', 'links')
-      .where('profile.user.id != :userId', { userId });
+      .leftJoin('profile.user', 'user')
+      .select(['profile.id'])
+      .where('user.id != :userId', { userId });
 
     if (preference.gender !== UserGender.BOTH) {
       query.andWhere('profile.gender = :gender', { gender: preference.gender });
     }
 
     if (preference.minAge) {
-      query.andWhere('YEAR(CURRENT_DATE) - YEAR(profile.birth) >= :minAge', {
+      query.andWhere('EXTRACT(YEAR FROM AGE(profile.birth)) >= :minAge', {
         minAge: preference.minAge,
       });
     }
     if (preference.maxAge) {
-      query.andWhere('YEAR(CURRENT_DATE) - YEAR(profile.birth) <= :maxAge', {
+      query.andWhere('EXTRACT(YEAR FROM AGE(profile.birth)) <= :maxAge', {
         maxAge: preference.maxAge,
       });
     }
 
-    const [data, total] = await query
+    const [idsData, total] = await query
       .orderBy('RANDOM()')
       .skip(offset)
       .take(limit)
       .getManyAndCount();
 
-    return PaginatedFeedDto.fromData(data, total);
+    if (total === 0) {
+      return PaginatedFeedDto.fromData([], total);
+    }
+
+    const profileIds = idsData.map((p) => p.id);
+
+    const fullProfiles = await this.profilesRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .leftJoinAndSelect('profile.links', 'links')
+      .whereInIds(profileIds)
+      .getMany();
+
+    return PaginatedFeedDto.fromData(fullProfiles, total);
   }
 }

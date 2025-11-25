@@ -24,7 +24,7 @@ export class LinksController {
   constructor(private readonly service: LinksService) {}
 
   @Post('new')
-  async add(@CurrentUser('id') userId: string, dto: CreateLinkDto): Promise<void> {
+  async add(@CurrentUser('id') userId: string, @Body() dto: CreateLinkDto): Promise<void> {
     return this.service.add(userId, dto);
   }
 

@@ -14,7 +14,7 @@ export class ProfilesService {
   ) {}
 
   async findByUserId(userId: string): Promise<ProfilesEntity | null> {
-    return this.repository.findOneBy({ user: { id: userId } });
+    return this.repository.findOne({ where: { user: { id: userId } }, select: ['id'] });
   }
 
   async create(userId: string, dto: CreateProfileDto): Promise<void> {
@@ -37,7 +37,10 @@ export class ProfilesService {
   }
 
   async update(userId: string, dto: UpdateProfileDto): Promise<void> {
-    const profile = await this.getByUserId(userId);
+    const profile = await this.findByUserId(userId);
+    if (!profile) {
+      throw new NotFoundException('Profile not found');
+    }
 
     await this.repository.update(profile.id, dto);
   }

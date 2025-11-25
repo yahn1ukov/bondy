@@ -17,7 +17,10 @@ export class PreferencesService {
   ) {}
 
   async findByUserId(userId: string): Promise<PreferencesEntity | null> {
-    return this.repository.findOneBy({ profile: { user: { id: userId } } });
+    return this.repository.findOne({
+      where: { profile: { user: { id: userId } } },
+      select: ['id', 'gender', 'minAge', 'maxAge'],
+    });
   }
 
   async create(userId: string, dto: CreatePreferenceDto): Promise<void> {

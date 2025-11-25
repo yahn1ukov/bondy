@@ -18,6 +18,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Incorrect credentials');
     }
 
-    return { id: user.id, email: user.email };
+    return { id: user.id };
   }
 }

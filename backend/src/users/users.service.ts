@@ -24,11 +24,11 @@ export class UsersService {
   ) {}
 
   async findById(id: string): Promise<UsersEntity | null> {
-    return this.repository.findOneBy({ id });
+    return this.repository.findOne({ where: { id }, select: ['id', 'refreshTokenHash'] });
   }
 
   async findByEmail(email: string): Promise<UsersEntity | null> {
-    return this.repository.findOneBy({ email });
+    return this.repository.findOne({ where: { email }, select: ['id', 'passwordHash'] });
   }
 
   async create(dto: CreateUserDto): Promise<UsersEntity> {
@@ -51,9 +51,10 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<void> {
-    const user = await this.getById(id);
-
-    await this.repository.update(user.id, dto);
+    const result = await this.repository.update(id, dto);
+    if (result.affected === 0) {
+      throw new NotFoundException('User not found');
+    }
   }
 
   async updatePassword(id: string, dto: UpdateUserPasswordDto): Promise<void> {
@@ -70,12 +71,16 @@ export class UsersService {
   }
 
   async updateRefreshToken(id: string, refreshTokenHash: string | null): Promise<void> {
-    await this.repository.update(id, { refreshTokenHash });
+    const result = await this.repository.update(id, { refreshTokenHash });
+    if (result.affected === 0) {
+      throw new NotFoundException('User not found');
+    }
   }
 
   async delete(id: string): Promise<void> {
-    const user = await this.getById(id);
-
-    await this.repository.delete(user.id);
+    const result = await this.repository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('User not found');
+    }
   }
 }
