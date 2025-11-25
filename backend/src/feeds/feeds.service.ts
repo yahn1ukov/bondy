@@ -31,9 +31,8 @@ export class FeedsService {
 
     const query = this.profilesRepository
       .createQueryBuilder('profile')
-      .leftJoin('profile.user', 'user')
       .select(['profile.id'])
-      .where('user.id != :userId', { userId });
+      .where('profile.user != :userId', { userId });
 
     if (preference.gender !== UserGender.BOTH) {
       query.andWhere('profile.gender = :gender', { gender: preference.gender });
@@ -52,8 +51,8 @@ export class FeedsService {
 
     const [idsData, total] = await query
       .orderBy('RANDOM()')
-      .skip(offset)
-      .take(limit)
+      .offset(offset)
+      .limit(limit)
       .getManyAndCount();
 
     if (total === 0) {
@@ -64,9 +63,8 @@ export class FeedsService {
 
     const fullProfiles = await this.profilesRepository
       .createQueryBuilder('profile')
-      .leftJoinAndSelect('profile.user', 'user')
       .leftJoinAndSelect('profile.links', 'links')
-      .whereInIds(profileIds)
+      .where('profile.id IN (:...ids)', { ids: profileIds })
       .getMany();
 
     return PaginatedFeedDto.fromData(fullProfiles, total);
