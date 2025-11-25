@@ -23,6 +23,11 @@ import { LinksService } from './links.service';
 export class LinksController {
   constructor(private readonly service: LinksService) {}
 
+  @Post('new')
+  async add(@CurrentUser('id') userId: string, dto: CreateLinkDto): Promise<void> {
+    return this.service.add(userId, dto);
+  }
+
   @Post()
   async create(@CurrentUser('id') userId: string, @Body() dtos: CreateLinkDto[]): Promise<void> {
     return this.service.create(userId, dtos);
@@ -30,7 +35,7 @@ export class LinksController {
 
   @Get()
   async getAll(@CurrentUser('id') userId: string): Promise<LinksEntity[]> {
-    return this.service.getAll(userId);
+    return this.service.getAllByUserId(userId);
   }
 
   @Patch(':id')

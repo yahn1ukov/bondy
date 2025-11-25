@@ -26,7 +26,17 @@ export class LinksService {
     await this.repository.save(links);
   }
 
-  async getAll(userId: string): Promise<LinksEntity[]> {
+  async add(userId: string, dto: CreateLinkDto): Promise<void> {
+    const profile = await this.profilesService.findByUserId(userId);
+    if (!profile) {
+      throw new NotFoundException('Profile not found');
+    }
+
+    const link = this.repository.create({ ...dto, profile });
+    await this.repository.save(link);
+  }
+
+  async getAllByUserId(userId: string): Promise<LinksEntity[]> {
     return this.repository.find({ where: { profile: { user: { id: userId } } } });
   }
 

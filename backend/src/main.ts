@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
-import { TypeOrmExceptionFilter } from './common/filters/typeorm-exception.filter';
 import { ConfigService } from './config/config.service';
 
 async function bootstrap(): Promise<void> {
@@ -30,7 +29,6 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
-  app.useGlobalFilters(new TypeOrmExceptionFilter());
 
   await app.listen(configService.port);
 }

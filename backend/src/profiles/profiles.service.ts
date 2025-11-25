@@ -27,10 +27,18 @@ export class ProfilesService {
     await this.repository.save(profile);
   }
 
-  async update(userId: string, dto: UpdateProfileDto): Promise<void> {
-    const result = await this.repository.update({ user: { id: userId } }, dto);
-    if (result.affected === 0) {
+  async getByUserId(userId: string): Promise<ProfilesEntity> {
+    const profile = await this.repository.findOneBy({ user: { id: userId } });
+    if (!profile) {
       throw new NotFoundException('Profile not found');
     }
+
+    return profile;
+  }
+
+  async update(userId: string, dto: UpdateProfileDto): Promise<void> {
+    const profile = await this.getByUserId(userId);
+
+    await this.repository.update(profile.id, dto);
   }
 }

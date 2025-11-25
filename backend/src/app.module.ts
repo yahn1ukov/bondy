@@ -7,7 +7,9 @@ import { CommonModule } from './common/common.module';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { DatabaseModule } from './database/database.module';
+import { FeedsModule } from './feeds/feeds.module';
 import { LinksModule } from './links/links.module';
+import { PreferencesModule } from './preferences/preferences.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { RedisModule } from './redis/redis.module';
 import { UsersModule } from './users/users.module';
@@ -31,6 +33,8 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     ProfilesModule,
     LinksModule,
+    PreferencesModule,
+    FeedsModule,
   ],
   providers: [
     {

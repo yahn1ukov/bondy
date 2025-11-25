@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
@@ -27,22 +32,32 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto): Promise<UsersEntity> {
+    const isExists = await this.repository.existsBy({ email: dto.email });
+    if (isExists) {
+      throw new ConflictException('User already exists');
+    }
+
     const user = this.repository.create(dto);
     return await this.repository.save(user);
   }
 
-  async update(id: string, dto: UpdateUserDto): Promise<void> {
-    const result = await this.repository.update(id, dto);
-    if (result.affected === 0) {
-      throw new NotFoundException('User not found.');
+  async getById(id: string): Promise<UsersEntity> {
+    const user = await this.repository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    return user;
+  }
+
+  async update(id: string, dto: UpdateUserDto): Promise<void> {
+    const user = await this.getById(id);
+
+    await this.repository.update(user.id, dto);
   }
 
   async updatePassword(id: string, dto: UpdateUserPasswordDto): Promise<void> {
-    const user = await this.repository.findOneBy({ id });
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
+    const user = await this.getById(id);
 
     const isMatch = await this.hashHelper.verify(user.passwordHash, dto.oldPassword);
     if (!isMatch) {
@@ -59,9 +74,8 @@ export class UsersService {
   }
 
   async delete(id: string): Promise<void> {
-    const result = await this.repository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException('User not found.');
-    }
+    const user = await this.getById(id);
+
+    await this.repository.delete(user.id);
   }
 }

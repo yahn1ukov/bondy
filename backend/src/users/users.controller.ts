@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Patch, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Res, UseGuards } from '@nestjs/common';
 
 import type { Response } from 'express';
 
@@ -8,6 +8,7 @@ import { CookieHelper } from '@/common/helpers/cookie.helper';
 
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersEntity } from './users.entity';
 import { UsersService } from './users.service';
 
 @UseGuards(JwtAuthGuard)
@@ -17,6 +18,11 @@ export class UsersController {
     private readonly service: UsersService,
     private readonly cookieHelper: CookieHelper,
   ) {}
+
+  @Get()
+  async get(@CurrentUser('id') id: string): Promise<UsersEntity> {
+    return this.service.getById(id);
+  }
 
   @Patch('password')
   async updatePassword(

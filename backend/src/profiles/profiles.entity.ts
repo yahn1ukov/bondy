@@ -1,25 +1,19 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
 import { UserGender } from '@/common/enums/user-gender.enum';
 import { LinksEntity } from '@/links/links.entity';
+import { PreferencesEntity } from '@/preferences/preferences.entity';
 import { UsersEntity } from '@/users/users.entity';
 
 @Entity('profiles')
 export class ProfilesEntity extends BaseEntity {
   @Column({ name: 'first_name' })
-  @Exclude()
   firstName: string;
 
   @Column('varchar', { name: 'last_name', nullable: true })
-  @Exclude()
   lastName: string | null;
-
-  @Expose()
-  get fullName(): string {
-    return [this.firstName, this.lastName].filter(Boolean).join(' ');
-  }
 
   @Column('text', { nullable: true })
   bio: string | null;
@@ -37,4 +31,7 @@ export class ProfilesEntity extends BaseEntity {
 
   @OneToMany(() => LinksEntity, (links) => links.profile)
   links: LinksEntity[];
+
+  @OneToOne(() => PreferencesEntity, (preference) => preference.profile)
+  preference: PreferencesEntity;
 }
