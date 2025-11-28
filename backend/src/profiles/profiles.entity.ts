@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
 import { UserGender } from '@/common/enums/user-gender.enum';
+import { FilesEntity } from '@/files/files.entity';
 import { LinksEntity } from '@/links/links.entity';
 import { PreferencesEntity } from '@/preferences/preferences.entity';
 import { UsersEntity } from '@/users/users.entity';
@@ -29,9 +30,12 @@ export class ProfilesEntity extends BaseEntity {
   @Exclude()
   user: UsersEntity;
 
-  @OneToMany(() => LinksEntity, (links) => links.profile)
-  links: LinksEntity[];
+  @OneToOne(() => FilesEntity, (file) => file.profile)
+  file: FilesEntity;
 
   @OneToOne(() => PreferencesEntity, (preference) => preference.profile)
   preference: PreferencesEntity;
+
+  @OneToMany(() => LinksEntity, (links) => links.profile)
+  links: LinksEntity[];
 }

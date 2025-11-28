@@ -8,7 +8,9 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { DatabaseModule } from './database/database.module';
 import { FeedsModule } from './feeds/feeds.module';
+import { FilesModule } from './files/files.module';
 import { LinksModule } from './links/links.module';
+import { MinioModule } from './minio/minio.module';
 import { PreferencesModule } from './preferences/preferences.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { RedisModule } from './redis/redis.module';
@@ -19,6 +21,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule,
     DatabaseModule,
     RedisModule,
+    MinioModule,
     ThrottlerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService): ThrottlerModuleOptions => [
@@ -32,6 +35,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     ProfilesModule,
+    FilesModule,
     LinksModule,
     PreferencesModule,
     FeedsModule,

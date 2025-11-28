@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import Redis from 'ioredis';
 
 import { ConfigService } from '@/config/config.service';
-import { REDIS_CLIENT } from '@/redis/redis.module';
+import { REDIS_TOKEN } from '@/redis/redis.constant';
 
 import type { ActiveUserData } from '../interfaces/active-user-data.interface';
 import type { DecodedToken } from '../interfaces/decoded-token.interface';
@@ -16,7 +16,7 @@ import type { Tokens } from '../interfaces/tokens.interface';
 export class TokenHelper {
   constructor(
     private readonly jwtService: NestJwtService,
-    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    @Inject(REDIS_TOKEN) private readonly redis: Redis,
     private readonly configService: ConfigService,
   ) {}
 

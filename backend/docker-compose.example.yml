@@ -1,14 +1,6 @@
 name:
 
 services:
-  adminer:
-    image: adminer:latest
-    container_name: adminer
-    ports:
-      - 8080:8080
-    networks:
-      - bondy-network
-
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -55,23 +47,10 @@ services:
     networks:
       - bondy-network
 
-  redis-insight:
-    image: redis/redisinsight:latest
-    container_name: redis_insight
-    ports:
-      - 5540:5540
-    volumes:
-      - redis_insight_data:/data
-    depends_on:
-      - redis
-    networks:
-      - bondy-network
-
 volumes:
   postgres_data:
   minio_data:
   redis_data:
-  redis_insight_data:
 
 networks:
   bondy-network:
