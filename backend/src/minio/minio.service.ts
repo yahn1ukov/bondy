@@ -13,19 +13,17 @@ export class MinioService {
     private readonly configService: ConfigService,
   ) {}
 
-  async upload(file: Express.Multer.File): Promise<void> {
-    await this.client.putObject(
-      this.configService.s3Bucket,
-      file.originalname,
-      file.buffer,
-      file.size,
-      {
-        contentType: file.mimetype,
-      },
-    );
+  async upload(path: string, buffer: Buffer, size: number, contentType: string): Promise<void> {
+    await this.client.putObject(this.configService.s3Bucket, path, buffer, size, {
+      contentType,
+    });
   }
 
-  async remove(objectName: string): Promise<void> {
-    await this.client.removeObject(this.configService.s3Bucket, objectName);
+  async remove(path: string): Promise<void> {
+    if (!path) {
+      return;
+    }
+
+    await this.client.removeObject(this.configService.s3Bucket, path);
   }
 }

@@ -1,9 +1,8 @@
-import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
 import { UserGender } from '@/common/enums/user-gender.enum';
-import { FilesEntity } from '@/files/files.entity';
+import { ImagesEntity } from '@/images/entities/images.entity';
 import { LinksEntity } from '@/links/links.entity';
 import { PreferencesEntity } from '@/preferences/preferences.entity';
 import { UsersEntity } from '@/users/users.entity';
@@ -27,11 +26,10 @@ export class ProfilesEntity extends BaseEntity {
 
   @OneToOne(() => UsersEntity, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  @Exclude()
   user: UsersEntity;
 
-  @OneToOne(() => FilesEntity, (file) => file.profile)
-  file: FilesEntity;
+  @OneToOne(() => ImagesEntity, (image) => image.profile)
+  image: ImagesEntity;
 
   @OneToOne(() => PreferencesEntity, (preference) => preference.profile)
   preference: PreferencesEntity;

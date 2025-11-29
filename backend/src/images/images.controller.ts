@@ -13,12 +13,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '@/auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
-import { FilesService } from './files.service';
+import { ImagesService } from './images.service';
 
 @UseGuards(JwtAuthGuard)
-@Controller('files')
-export class FilesController {
-  constructor(private readonly service: FilesService) {}
+@Controller('images')
+export class ImagesController {
+  constructor(private readonly service: ImagesService) {}
 
   @UseInterceptors(FileInterceptor('file'))
   @Post()

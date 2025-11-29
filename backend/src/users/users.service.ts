@@ -24,11 +24,23 @@ export class UsersService {
   ) {}
 
   async findById(id: string): Promise<UsersEntity | null> {
-    return this.repository.findOne({ where: { id }, select: ['id', 'refreshTokenHash'] });
+    return this.repository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        refreshTokenHash: true,
+      },
+    });
   }
 
   async findByEmail(email: string): Promise<UsersEntity | null> {
-    return this.repository.findOne({ where: { email }, select: ['id', 'passwordHash'] });
+    return this.repository.findOne({
+      where: { email },
+      select: {
+        id: true,
+        passwordHash: true,
+      },
+    });
   }
 
   async create(dto: CreateUserDto): Promise<UsersEntity> {

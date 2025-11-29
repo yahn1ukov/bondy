@@ -1,4 +1,5 @@
 import { UserGender } from '@/common/enums/user-gender.enum';
+import { ImagesEntity } from '@/images/entities/images.entity';
 import { LinksEntity } from '@/links/links.entity';
 import { ProfilesEntity } from '@/profiles/profiles.entity';
 
@@ -9,6 +10,7 @@ class FeedProfileDto {
   bio: string | null;
   gender: UserGender;
   birth: Date;
+  image: ImagesEntity;
   links: LinksEntity[];
 
   static fromEntity(profile: ProfilesEntity): FeedProfileDto {
@@ -20,6 +22,7 @@ class FeedProfileDto {
     dto.bio = profile.bio;
     dto.gender = profile.gender;
     dto.birth = profile.birth;
+    dto.image = profile.image;
     dto.links = profile.links;
 
     return dto;

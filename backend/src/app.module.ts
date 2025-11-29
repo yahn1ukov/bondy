@@ -8,7 +8,7 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { DatabaseModule } from './database/database.module';
 import { FeedsModule } from './feeds/feeds.module';
-import { FilesModule } from './files/files.module';
+import { ImagesModule } from './images/images.module';
 import { LinksModule } from './links/links.module';
 import { MinioModule } from './minio/minio.module';
 import { PreferencesModule } from './preferences/preferences.module';
@@ -35,7 +35,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     ProfilesModule,
-    FilesModule,
+    ImagesModule,
     LinksModule,
     PreferencesModule,
     FeedsModule,

@@ -64,6 +64,8 @@ export class FeedsService {
     const fullProfiles = await this.profilesRepository
       .createQueryBuilder('profile')
       .leftJoinAndSelect('profile.links', 'links')
+      .leftJoinAndSelect('profile.image', 'image')
+      .leftJoinAndSelect('image.variants', 'variants')
       .where('profile.id IN (:...ids)', { ids: profileIds })
       .getMany();
 

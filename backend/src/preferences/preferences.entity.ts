@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
@@ -18,6 +17,5 @@ export class PreferencesEntity extends BaseEntity {
 
   @OneToOne(() => ProfilesEntity, (profile) => profile.preference, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'profile_id' })
-  @Exclude()
   profile: ProfilesEntity;
 }
