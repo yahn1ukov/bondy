@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { MinioService } from '@/minio/minio.service';
 import { ProfilesService } from '@/profiles/profiles.service';
@@ -17,45 +17,79 @@ export class ImagesService {
   constructor(
     @InjectRepository(ImagesEntity) private readonly repository: Repository<ImagesEntity>,
     private readonly helper: ImagesHelper,
-    private readonly profileService: ProfilesService,
+    private readonly dataSource: DataSource,
     private readonly minioService: MinioService,
+    private readonly profileService: ProfilesService,
   ) {}
 
-  async create(userId: string, file: Express.Multer.File): Promise<void> {
-    const profile = await this.profileService.findByUserId(userId);
-    if (!profile) {
-      throw new NotFoundException('Profile not found');
+  async create(userId: string, image: Express.Multer.File): Promise<void> {
+    const uploadedPaths: string[] = [];
+
+    try {
+      const profile = await this.profileService.findByUserId(userId);
+      if (!profile) {
+        throw new NotFoundException('Profile not found');
+      }
+
+      const [blurHash, webImage, mobileImage] = await Promise.all([
+        this.helper.generateBlurHash(image.buffer),
+        this.helper.processForWeb(image.buffer),
+        this.helper.processForMobile(image.buffer),
+      ]);
+
+      const imageId = this.helper.generateId();
+      const webPath = `profiles/${profile.id}/${imageId}-web.webp`;
+      const mobilePath = `profiles/${profile.id}/${imageId}-mobile.jpeg`;
+
+      uploadedPaths.push(webPath, mobilePath);
+
+      await Promise.all([
+        this.minioService.upload(webPath, webImage.buffer, webImage.size, webImage.contentType),
+        this.minioService.upload(
+          mobilePath,
+          mobileImage.buffer,
+          mobileImage.size,
+          mobileImage.contentType,
+        ),
+      ]);
+
+      await this.dataSource.transaction(async (manager) => {
+        const oldImage = await manager.findOne(ImagesEntity, {
+          where: { profile: { user: { id: userId } } },
+          relations: { variants: true },
+          select: { id: true, variants: { path: true } },
+        });
+        if (oldImage) {
+          await manager.delete(ImagesEntity, oldImage.id);
+
+          await this.removeFiles(oldImage.variants.map((variant) => variant.path));
+        }
+
+        const newImage = manager.create(ImagesEntity, {
+          profile,
+          blurHash,
+          variants: [
+            this.createVariant(ImageVariantType.WEB, webPath, webImage),
+            this.createVariant(ImageVariantType.MOBILE, mobilePath, mobileImage),
+          ],
+        });
+        await manager.save(newImage);
+      });
+    } catch (_: unknown) {
+      await this.removeFiles(uploadedPaths);
+    }
+  }
+
+  async getByUserId(userId: string): Promise<ImagesEntity> {
+    const image = await this.repository.findOne({
+      where: { profile: { user: { id: userId } } },
+      relations: { variants: true },
+    });
+    if (!image) {
+      throw new NotFoundException('Image not found');
     }
 
-    const [blurHash, webImage, mobileImage] = await Promise.all([
-      this.helper.generateBlurhash(file.buffer),
-      this.helper.processForWeb(file.buffer),
-      this.helper.processForMobile(file.buffer),
-    ]);
-
-    const imageId = this.helper.generateId();
-    const webImagePath = `profiles/${profile.id}/${imageId}-web.webp`;
-    const mobileImagePath = `profiles/${profile.id}/${imageId}-mobile.jpeg`;
-
-    await Promise.all([
-      this.minioService.upload(webImagePath, webImage.buffer, webImage.size, webImage.contentType),
-      this.minioService.upload(
-        mobileImagePath,
-        mobileImage.buffer,
-        mobileImage.size,
-        mobileImage.contentType,
-      ),
-    ]);
-
-    const image = this.repository.create({
-      profile,
-      blurHash,
-      variants: [
-        this.createVariant(ImageVariantType.WEB, webImagePath, webImage),
-        this.createVariant(ImageVariantType.MOBILE, mobileImagePath, mobileImage),
-      ],
-    });
-    await this.repository.save(image);
+    return image;
   }
 
   async delete(userId: string, id: string): Promise<void> {
@@ -70,14 +104,27 @@ export class ImagesService {
 
     await this.repository.delete(image.id);
 
-    await Promise.all(image.variants.map((variant) => this.minioService.remove(variant.path)));
+    await this.removeFiles(image.variants.map((variant) => variant.path));
   }
 
   private createVariant(
     type: ImageVariantType,
     path: string,
-    { size, contentType, width, height }: ProcessedImage,
+    image: ProcessedImage,
   ): Partial<ImageVariantsEntity> {
-    return { type, path, size, contentType, width, height };
+    return {
+      type,
+      path,
+      size: image.size,
+      contentType: image.contentType,
+      width: image.width,
+      height: image.height,
+    };
+  }
+
+  private async removeFiles(paths: string[]): Promise<void> {
+    if (paths.length) {
+      await Promise.all(paths.map((path) => this.minioService.remove(path)));
+    }
   }
 }

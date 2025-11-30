@@ -13,8 +13,8 @@ export class MinioService {
     private readonly configService: ConfigService,
   ) {}
 
-  async upload(path: string, buffer: Buffer, size: number, contentType: string): Promise<void> {
-    await this.client.putObject(this.configService.s3Bucket, path, buffer, size, {
+  async upload(path: string, file: Buffer, size: number, contentType: string): Promise<void> {
+    await this.client.putObject(this.configService.s3Bucket, path, file, size, {
       contentType,
     });
   }

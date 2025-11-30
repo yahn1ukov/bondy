@@ -28,25 +28,32 @@ export class FeedsService {
     }
 
     const offset = (page - 1) * limit;
+    const today = new Date();
 
     const query = this.profilesRepository
       .createQueryBuilder('profile')
       .select(['profile.id'])
-      .where('profile.user != :userId', { userId });
+      .where('profile.user_id != :userId', { userId });
 
     if (preference.gender !== UserGender.BOTH) {
       query.andWhere('profile.gender = :gender', { gender: preference.gender });
     }
 
     if (preference.minAge) {
-      query.andWhere('EXTRACT(YEAR FROM AGE(profile.birth)) >= :minAge', {
-        minAge: preference.minAge,
-      });
+      const maxBirthDate = new Date(
+        today.getFullYear() - preference.minAge,
+        today.getMonth(),
+        today.getDate(),
+      );
+      query.andWhere('profile.birth <= :maxBirthDate', { maxBirthDate });
     }
     if (preference.maxAge) {
-      query.andWhere('EXTRACT(YEAR FROM AGE(profile.birth)) <= :maxAge', {
-        maxAge: preference.maxAge,
-      });
+      const minBirthDate = new Date(
+        today.getFullYear() - preference.maxAge - 1,
+        today.getMonth(),
+        today.getDate(),
+      );
+      query.andWhere('profile.birth > :minBirthDate', { minBirthDate });
     }
 
     const [idsData, total] = await query
@@ -63,9 +70,9 @@ export class FeedsService {
 
     const fullProfiles = await this.profilesRepository
       .createQueryBuilder('profile')
-      .leftJoinAndSelect('profile.links', 'links')
       .leftJoinAndSelect('profile.image', 'image')
       .leftJoinAndSelect('image.variants', 'variants')
+      .leftJoinAndSelect('profile.links', 'links')
       .where('profile.id IN (:...ids)', { ids: profileIds })
       .getMany();
 

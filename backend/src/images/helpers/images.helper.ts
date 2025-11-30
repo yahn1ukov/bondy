@@ -15,7 +15,7 @@ export class ImagesHelper {
     return randomUUID();
   }
 
-  async generateBlurhash(buffer: Buffer): Promise<string> {
+  async generateBlurHash(buffer: Buffer): Promise<string> {
     const { data, info } = await sharp(buffer)
       .raw()
       .ensureAlpha()
@@ -26,38 +26,31 @@ export class ImagesHelper {
   }
 
   async processForWeb(buffer: Buffer): Promise<ProcessedImage> {
-    const { data, info } = await sharp(buffer)
-      .rotate()
-      .resize(this.TARGET_WIDTH, this.TARGET_HEIGHT, {
-        fit: 'cover',
-        position: sharp.strategy.attention,
-      })
-      .webp({ quality: 80 })
-      .toBuffer({ resolveWithObject: true });
-
-    return {
-      buffer: data,
-      size: info.size,
-      contentType: 'image/webp',
-      width: info.width,
-      height: info.height,
-    };
+    return this.processImage(buffer, 'webp', { quality: 80 });
   }
 
   async processForMobile(buffer: Buffer): Promise<ProcessedImage> {
+    return this.processImage(buffer, 'jpeg', { quality: 90, mozjpeg: true });
+  }
+
+  private async processImage(
+    buffer: Buffer,
+    format: 'webp' | 'jpeg',
+    options: object,
+  ): Promise<ProcessedImage> {
     const { data, info } = await sharp(buffer)
       .rotate()
       .resize(this.TARGET_WIDTH, this.TARGET_HEIGHT, {
         fit: 'cover',
         position: sharp.strategy.attention,
       })
-      .jpeg({ quality: 90, mozjpeg: true })
+      [format](options)
       .toBuffer({ resolveWithObject: true });
 
     return {
       buffer: data,
       size: info.size,
-      contentType: 'image/jpeg',
+      contentType: `image/${format}`,
       width: info.width,
       height: info.height,
     };

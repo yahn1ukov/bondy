@@ -37,7 +37,10 @@ export class LinksService {
   }
 
   async getAllByUserId(userId: string): Promise<LinksEntity[]> {
-    return this.repository.find({ where: { profile: { user: { id: userId } } } });
+    return this.repository.find({
+      where: { profile: { user: { id: userId } } },
+      order: { createdAt: 'ASC' },
+    });
   }
 
   async update(userId: string, id: string, dto: UpdateLinkDto): Promise<void> {
@@ -55,7 +58,7 @@ export class LinksService {
   private async getById(id: string, userId: string): Promise<LinksEntity> {
     const link = await this.repository.findOne({
       where: { id, profile: { user: { id: userId } } },
-      select: ['id'],
+      select: { id: true },
     });
     if (!link) {
       throw new NotFoundException('Link not found');

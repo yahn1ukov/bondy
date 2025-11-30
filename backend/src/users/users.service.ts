@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 import { HashHelper } from '@/common/helpers/hash.helper';
 
@@ -24,23 +24,11 @@ export class UsersService {
   ) {}
 
   async findById(id: string): Promise<UsersEntity | null> {
-    return this.repository.findOne({
-      where: { id },
-      select: {
-        id: true,
-        refreshTokenHash: true,
-      },
-    });
+    return this.repository.findOne({ where: { id }, select: { id: true, refreshTokenHash: true } });
   }
 
   async findByEmail(email: string): Promise<UsersEntity | null> {
-    return this.repository.findOne({
-      where: { email },
-      select: {
-        id: true,
-        passwordHash: true,
-      },
-    });
+    return this.repository.findOne({ where: { email }, select: { id: true, passwordHash: true } });
   }
 
   async create(dto: CreateUserDto): Promise<UsersEntity> {
@@ -63,6 +51,16 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<void> {
+    if (dto.email) {
+      const isTaken = await this.repository.findOne({
+        where: { id: Not(id), email: dto.email },
+        select: { id: true },
+      });
+      if (isTaken) {
+        throw new ConflictException('Email is already taken');
+      }
+    }
+
     const result = await this.repository.update(id, dto);
     if (result.affected === 0) {
       throw new NotFoundException('User not found');

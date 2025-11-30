@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
 import { UserGender } from '@/common/enums/user-gender.enum';
@@ -19,9 +19,11 @@ export class ProfilesEntity extends BaseEntity {
   bio: string | null;
 
   @Column('enum', { enum: UserGender })
+  @Index()
   gender: UserGender;
 
   @Column()
+  @Index()
   birth: Date;
 
   @OneToOne(() => UsersEntity, (user) => user.profile, { onDelete: 'CASCADE' })

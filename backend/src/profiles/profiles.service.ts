@@ -14,7 +14,7 @@ export class ProfilesService {
   ) {}
 
   async findByUserId(userId: string): Promise<ProfilesEntity | null> {
-    return this.repository.findOne({ where: { user: { id: userId } }, select: ['id'] });
+    return this.repository.findOne({ where: { user: { id: userId } }, select: { id: true } });
   }
 
   async create(userId: string, dto: CreateProfileDto): Promise<void> {

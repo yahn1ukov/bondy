@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, Index, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '@/common/entities/base.entity';
 import { ProfilesEntity } from '@/profiles/profiles.entity';
@@ -7,6 +7,7 @@ import { ProfilesEntity } from '@/profiles/profiles.entity';
 @Entity('users')
 export class UsersEntity extends BaseEntity {
   @Column({ unique: true })
+  @Index()
   email: string;
 
   @Column({ name: 'password_hash' })

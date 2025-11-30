@@ -19,7 +19,7 @@ export class PreferencesService {
   async findByUserId(userId: string): Promise<PreferencesEntity | null> {
     return this.repository.findOne({
       where: { profile: { user: { id: userId } } },
-      select: ['id', 'gender', 'minAge', 'maxAge'],
+      select: { id: true, gender: true, minAge: true, maxAge: true },
     });
   }
 
